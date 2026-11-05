@@ -2,6 +2,7 @@ package com.atlas.bank.account.model;
 
 import com.atlas.bank.shared.model.Currency;
 import com.atlas.bank.shared.model.Money;
+import com.atlas.bank.transaction.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -48,6 +49,9 @@ public class Account {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "customer_id")
+    private Long customerId;
+
     @PrePersist //Asignar valores por defecto
     public void prePersist(){
         this.createdAt = LocalDateTime.now();
@@ -55,5 +59,18 @@ public class Account {
         if(balance == null) balance = Money.zero(Currency.MXN);
 
     }
+
+    public void deposit(Money amount){
+        if(amount.isNegative()) throw new IllegalArgumentException("El monto a depositar no puede ser negativo");
+        this.balance = this.balance.add(amount);
+    }
+
+    public void withdraw(Money amount){
+        if(amount.isNegative()) throw new IllegalArgumentException("El monto a retirar no puede ser negativo");
+        if(balance.isLessThan(amount)) throw new InsufficientFundsException(id,balance.getAmount(), amount.getAmount());
+        this.balance = this.balance.subtract(amount);
+    }
+
+
 
 }
