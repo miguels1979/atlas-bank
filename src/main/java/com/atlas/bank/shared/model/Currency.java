@@ -1,4 +1,5 @@
 package com.atlas.bank.shared.model;
 
-public class Currency {
+public enum Currency {
+    MXN, USD
 }
