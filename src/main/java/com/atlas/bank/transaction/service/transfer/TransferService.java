@@ -4,7 +4,6 @@ package com.atlas.bank.transaction.service.transfer;
 import com.atlas.bank.account.exception.AccountNotFoundException;
 import com.atlas.bank.account.model.Account;
 import com.atlas.bank.account.repository.AccountRepository;
-import com.atlas.bank.transaction.exception.InsufficientFundsException;
 import com.atlas.bank.transaction.model.Transaction;
 import com.atlas.bank.transaction.repository.TransactionRepository;
 import com.atlas.bank.transaction.service.TransactionProcessor;
@@ -83,16 +82,6 @@ public class TransferService extends TransactionProcessor<TransferContext> imple
                 .calculate(context.amount());
     }
 
-    @Override
-    protected void validateFunds(TransferContext context, BigDecimal fee) {
-        //Validar fondos (monto + comisión)
-        BigDecimal balance = context.from().getBalance().getAmount();
-        BigDecimal totalDebit = context.amount().add(fee);
-
-        if(balance.compareTo(totalDebit) < 0){
-            throw new InsufficientFundsException(context.from().getId(), balance, totalDebit);
-        }
-    }
 
     @Override
     protected void updateBalances(TransferContext context, BigDecimal fee) {

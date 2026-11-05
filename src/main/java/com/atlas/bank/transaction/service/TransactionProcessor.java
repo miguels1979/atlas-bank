@@ -17,7 +17,6 @@ public abstract class TransactionProcessor<T> {
     public Transaction process(T context){
         validate(context);
         BigDecimal fee = calculateFee(context);
-        validateFunds(context, fee);
         updateBalances(context,fee);
         return save(context,fee);
 
@@ -25,7 +24,6 @@ public abstract class TransactionProcessor<T> {
 
     protected abstract void validate(T context);
     protected abstract BigDecimal calculateFee(T context);
-    protected abstract void validateFunds(T context, BigDecimal fee) ;
     protected abstract void updateBalances(T context, BigDecimal fee);
     protected abstract Transaction save(T context, BigDecimal fee);
 
