@@ -1,9 +1,10 @@
 package com.atlas.bank.account.model;
 
+import com.atlas.bank.shared.model.Currency;
+import com.atlas.bank.shared.model.Money;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,8 +34,12 @@ public class Account {
     @Column(nullable = false, length = 20)
     private AccountType type; //SAVINGS, CHECKING
 
-    @Column(nullable = false)
-    private BigDecimal balance;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "balance", nullable = false)),
+            @AttributeOverride(name = "currency", column = @Column(name = "currency", nullable = false, length = 3))
+    })
+    private Money balance;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -47,7 +52,7 @@ public class Account {
     public void prePersist(){
         this.createdAt = LocalDateTime.now();
         if(status == null) status = AccountStatus.ACTIVE;
-        if(balance == null) balance = BigDecimal.ZERO;
+        if(balance == null) balance = Money.zero(Currency.MXN);
 
     }
 
