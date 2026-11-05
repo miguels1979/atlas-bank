@@ -4,11 +4,11 @@ package com.atlas.bank.transaction.service.transfer;
 import com.atlas.bank.account.exception.AccountNotFoundException;
 import com.atlas.bank.account.model.Account;
 import com.atlas.bank.account.repository.AccountRepository;
-import com.atlas.bank.shared.model.Money;
 import com.atlas.bank.transaction.exception.InsufficientFundsException;
 import com.atlas.bank.transaction.model.Transaction;
 import com.atlas.bank.transaction.repository.TransactionRepository;
 import com.atlas.bank.transaction.service.TransactionProcessor;
+import com.atlas.bank.transaction.service.domain.TransferDomainService;
 import com.atlas.bank.transaction.service.event.TransactionExecutedEvent;
 import com.atlas.bank.transaction.service.factory.TransactionFactory;
 import com.atlas.bank.transaction.service.fee.FeeCalculator;
@@ -27,17 +27,20 @@ public class TransferService extends TransactionProcessor<TransferContext> imple
     private final List<FeeCalculator> feeCalculators;
     private final ApplicationEventPublisher eventPublisher;
     private final List<TransferValidator> validators;
+    private final TransferDomainService transferDomainService;
 
-    public TransferService(TransactionRepository transactionRepository,
+    public TransferService(TransactionRepository transactionRepository ,
                            AccountRepository accountRepository,
                            List<FeeCalculator> feeCalculators,
                            ApplicationEventPublisher eventPublisher,
-                           List<TransferValidator> validators) {
+                           List<TransferValidator> validators,
+                           TransferDomainService transferDomainService) {
         super(transactionRepository);
         this.accountRepository = accountRepository;
         this.feeCalculators = feeCalculators;
         this.eventPublisher = eventPublisher;
         this.validators = validators;
+        this.transferDomainService = transferDomainService;
     }
 
 
@@ -94,12 +97,7 @@ public class TransferService extends TransactionProcessor<TransferContext> imple
     @Override
     protected void updateBalances(TransferContext context, BigDecimal fee) {
 
-        BigDecimal newFromBalance = context.from().getBalance().getAmount().subtract(context.amount()).subtract(fee);
-        context.from().setBalance(Money.of(newFromBalance,context.from().getBalance().getCurrency()));
-
-        BigDecimal newToBalance =  context.to().getBalance().getAmount().add(context.amount());
-        context.to().setBalance(Money.of(newToBalance,context.to().getBalance().getCurrency()));
-
+        transferDomainService.transfer(context.from(), context.to(), context.amount(),fee);
         accountRepository.save(context.from());
         accountRepository.save(context.to());
 
