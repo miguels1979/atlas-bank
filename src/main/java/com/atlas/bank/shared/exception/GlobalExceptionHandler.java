@@ -90,4 +90,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex){
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problem.setTitle("Datos inválidos");
+        return problem;
+
+    }
+
 }
