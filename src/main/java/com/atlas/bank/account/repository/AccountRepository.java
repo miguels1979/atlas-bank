@@ -1,7 +1,8 @@
 package com.atlas.bank.account.repository;
 
 import com.atlas.bank.account.model.Account;
+import com.atlas.bank.application.port.out.AccountRepositoryPort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AccountRepository extends JpaRepository<Account, Long>, DomainAccountRepository {
+public interface AccountRepository extends JpaRepository<Account, Long>, DomainAccountRepository, AccountRepositoryPort {
 }
