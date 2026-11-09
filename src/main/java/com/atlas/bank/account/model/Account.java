@@ -1,9 +1,11 @@
 package com.atlas.bank.account.model;
 
-import com.atlas.bank.shared.model.Currency;
+import com.atlas.bank.domain.model.account.AccountStatus;
+import com.atlas.bank.domain.model.account.AccountType;
+import com.atlas.bank.domain.model.shared.Currency;
 import com.atlas.bank.shared.model.Email;
 import com.atlas.bank.shared.model.Money;
-import com.atlas.bank.transaction.exception.InsufficientFundsException;
+import com.atlas.bank.domain.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 

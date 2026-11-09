@@ -1,6 +1,6 @@
 package com.atlas.bank.transaction.service.fee;
 
-import com.atlas.bank.account.model.AccountType;
+import com.atlas.bank.domain.model.account.AccountType;
 
 import java.math.BigDecimal;
 

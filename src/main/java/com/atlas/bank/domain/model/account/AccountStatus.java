@@ -1,4 +1,4 @@
-package com.atlas.bank.account.model;
+package com.atlas.bank.domain.model.account;
 
 public enum AccountStatus {
 

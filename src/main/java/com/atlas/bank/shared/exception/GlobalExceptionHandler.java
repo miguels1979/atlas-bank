@@ -1,15 +1,14 @@
 package com.atlas.bank.shared.exception;
 
-import com.atlas.bank.account.exception.AccountNotFoundException;
+import com.atlas.bank.domain.exception.AccountNotFoundException;
 import com.atlas.bank.transaction.exception.AccountNotActiveException;
-import com.atlas.bank.transaction.exception.InsufficientFundsException;
+import com.atlas.bank.domain.exception.InsufficientFundsException;
 import com.atlas.bank.transaction.service.exception.FraudCheckException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.*;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
