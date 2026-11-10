@@ -1,9 +1,9 @@
 package com.atlas.bank.account.service;
 
 
+import com.atlas.bank.application.port.out.AccountRepositoryPort;
 import com.atlas.bank.domain.exception.AccountNotFoundException;
 import com.atlas.bank.domain.model.account.Account;
-import com.atlas.bank.account.repository.DomainAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountService implements IAccountService {
 
-    private final DomainAccountRepository accountRepository;
+    private final AccountRepositoryPort accountRepository;
 
     @Override
     @Transactional
