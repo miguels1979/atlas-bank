@@ -1,4 +1,4 @@
-package com.atlas.bank.transaction.service.fee;
+package com.atlas.bank.domain.strategy.fee;
 
 import com.atlas.bank.domain.model.account.AccountType;
 import org.springframework.core.annotation.Order;
@@ -6,15 +6,14 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-@Component
-@Order(1)
-public class PremiumFeeCalculator implements FeeCalculator{
 
+@Component
+@Order // prioridad más baja: debe evaluarse al final porque supports() siempre devuelve true
+public class DefaultFeeCalculator implements FeeCalculator {
 
     @Override
     public boolean supports(AccountType accountType) {
-
-        return accountType == AccountType.PREMIUM;
+        return true;
     }
 
     @Override

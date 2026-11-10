@@ -1,9 +1,9 @@
 package com.atlas.bank.shared.exception;
 
 import com.atlas.bank.domain.exception.AccountNotFoundException;
-import com.atlas.bank.transaction.exception.AccountNotActiveException;
+import com.atlas.bank.domain.exception.AccountNotActiveException;
 import com.atlas.bank.domain.exception.InsufficientFundsException;
-import com.atlas.bank.transaction.service.exception.FraudCheckException;
+import com.atlas.bank.domain.exception.FraudCheckException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;

@@ -5,13 +5,14 @@ import com.atlas.bank.domain.exception.AccountNotFoundException;
 import com.atlas.bank.domain.model.account.Account;
 import com.atlas.bank.application.port.in.TransferMoneyUseCase;
 import com.atlas.bank.application.port.out.AccountRepositoryPort;
-import com.atlas.bank.transaction.model.Transaction;
+import com.atlas.bank.domain.model.transaction.TransferContext;
+import com.atlas.bank.domain.model.transaction.Transaction;
 import com.atlas.bank.transaction.repository.TransactionRepository;
 import com.atlas.bank.transaction.service.TransactionProcessor;
-import com.atlas.bank.transaction.service.domain.TransferDomainService;
+import com.atlas.bank.domain.service.TransferDomainService;
 import com.atlas.bank.transaction.service.factory.TransactionFactory;
-import com.atlas.bank.transaction.service.fee.FeeCalculator;
-import com.atlas.bank.transaction.validation.chain.TransferValidator;
+import com.atlas.bank.domain.strategy.fee.FeeCalculator;
+import com.atlas.bank.domain.validation.TransferValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

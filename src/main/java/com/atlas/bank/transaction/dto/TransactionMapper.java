@@ -1,6 +1,6 @@
 package com.atlas.bank.transaction.dto;
 
-import com.atlas.bank.transaction.model.Transaction;
+import com.atlas.bank.domain.model.transaction.Transaction;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

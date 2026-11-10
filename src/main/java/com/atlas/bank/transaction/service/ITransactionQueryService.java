@@ -1,6 +1,6 @@
 package com.atlas.bank.transaction.service;
 
-import com.atlas.bank.transaction.model.Transaction;
+import com.atlas.bank.domain.model.transaction.Transaction;
 
 import java.util.List;
 
