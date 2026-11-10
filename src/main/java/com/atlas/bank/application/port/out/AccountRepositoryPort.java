@@ -1,6 +1,6 @@
 package com.atlas.bank.application.port.out;
 
-import com.atlas.bank.account.model.Account;
+import com.atlas.bank.domain.model.account.Account;
 
 import java.util.List;
 import java.util.Optional;

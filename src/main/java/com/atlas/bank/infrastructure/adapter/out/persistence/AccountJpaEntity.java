@@ -1,11 +1,10 @@
-package com.atlas.bank.account.model;
+package com.atlas.bank.infrastructure.adapter.out.persistence;
 
 import com.atlas.bank.domain.model.account.AccountStatus;
 import com.atlas.bank.domain.model.account.AccountType;
 import com.atlas.bank.domain.model.shared.Currency;
 import com.atlas.bank.shared.model.Email;
 import com.atlas.bank.shared.model.Money;
-import com.atlas.bank.domain.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,14 +17,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Account {
+public class AccountJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "account_number", nullable = false)
+    @Column(name = "account_number", nullable = false, unique = true)
     private String accountNumber;
 
     @Column(name = "owner_name", nullable = false)
@@ -37,7 +36,7 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private AccountType type; //SAVINGS, CHECKING
+    private AccountType type;
 
     @Embedded
     @AttributeOverrides({
@@ -48,7 +47,7 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private AccountStatus status; //ACTIVE, CLOSED, FROZEN
+    private AccountStatus status;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,25 +55,10 @@ public class Account {
     @Column(name = "customer_id")
     private Long customerId;
 
-    @PrePersist //Asignar valores por defecto
-    public void prePersist(){
+    @PrePersist
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if(status == null) status = AccountStatus.ACTIVE;
-        if(balance == null) balance = Money.zero(Currency.MXN);
-
+        if (status == null) status = AccountStatus.ACTIVE;
+        if (balance == null) balance = Money.zero(Currency.MXN);
     }
-
-    public void deposit(Money amount){
-        if(amount.isNegative()) throw new IllegalArgumentException("El monto a depositar no puede ser negativo");
-        this.balance = this.balance.add(amount);
-    }
-
-    public void withdraw(Money amount){
-        if(amount.isNegative()) throw new IllegalArgumentException("El monto a retirar no puede ser negativo");
-        if(balance.isLessThan(amount)) throw new InsufficientFundsException(id,balance.getAmount(), amount.getAmount());
-        this.balance = this.balance.subtract(amount);
-    }
-
-
-
 }

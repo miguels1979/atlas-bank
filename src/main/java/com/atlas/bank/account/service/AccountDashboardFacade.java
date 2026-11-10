@@ -2,12 +2,10 @@ package com.atlas.bank.account.service;
 
 
 import com.atlas.bank.account.dto.DashboardResponse;
-import com.atlas.bank.account.model.Account;
+import com.atlas.bank.domain.model.account.Account;
 import com.atlas.bank.transaction.dto.TransactionMapper;
 import com.atlas.bank.transaction.dto.TransactionResponse;
 import com.atlas.bank.transaction.service.ITransactionQueryService;
-import com.atlas.bank.transaction.service.fraud.FraudCheckResult;
-import com.atlas.bank.transaction.service.fraud.FraudChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

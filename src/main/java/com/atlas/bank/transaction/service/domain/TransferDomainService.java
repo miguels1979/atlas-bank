@@ -1,6 +1,6 @@
 package com.atlas.bank.transaction.service.domain;
 
-import com.atlas.bank.account.model.Account;
+import com.atlas.bank.domain.model.account.Account;
 import com.atlas.bank.shared.model.Money;
 import org.springframework.stereotype.Service;
 

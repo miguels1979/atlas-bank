@@ -1,6 +1,6 @@
 package com.atlas.bank.application.port.in;
 
-import com.atlas.bank.account.model.Account;
+import com.atlas.bank.domain.model.account.Account;
 
 public interface CreateAccountUseCase {
 
