@@ -1,4 +1,4 @@
-package com.atlas.bank.account.dto;
+package com.atlas.bank.infrastructure.adapter.in.rest.dto;
 
 import lombok.Data;
 

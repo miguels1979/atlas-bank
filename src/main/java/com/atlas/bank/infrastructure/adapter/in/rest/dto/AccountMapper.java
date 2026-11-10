@@ -1,4 +1,4 @@
-package com.atlas.bank.account.dto;
+package com.atlas.bank.infrastructure.adapter.in.rest.dto;
 
 import com.atlas.bank.domain.model.account.Account;
 import com.atlas.bank.domain.model.shared.Currency;

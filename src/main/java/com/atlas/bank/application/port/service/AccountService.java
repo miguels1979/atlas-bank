@@ -1,4 +1,4 @@
-package com.atlas.bank.account.service;
+package com.atlas.bank.application.port.service;
 
 
 import com.atlas.bank.application.port.out.AccountRepositoryPort;
