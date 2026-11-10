@@ -1,6 +1,5 @@
-package com.atlas.bank.transaction.dto;
+package com.atlas.bank.infrastructure.adapter.in.rest.dto;
 
-import com.atlas.bank.transaction.validation.DifferentAccounts;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;

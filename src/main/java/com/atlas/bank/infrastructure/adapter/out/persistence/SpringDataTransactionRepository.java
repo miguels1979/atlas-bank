@@ -1,4 +1,11 @@
 package com.atlas.bank.infrastructure.adapter.out.persistence;
 
-public interface SpringDataTransactionRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface SpringDataTransactionRepository extends JpaRepository<TransactionJpaEntity, Long> {
+
+    List<TransactionJpaEntity> findBySourceAccountIdOrTargetAccountId(Long sourceId, Long targetId);
+
 }

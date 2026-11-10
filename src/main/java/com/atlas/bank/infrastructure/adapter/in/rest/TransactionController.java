@@ -1,9 +1,9 @@
-package com.atlas.bank.transaction.controller;
+package com.atlas.bank.infrastructure.adapter.in.rest;
 
 import com.atlas.bank.application.port.in.TransferMoneyUseCase;
-import com.atlas.bank.transaction.dto.TransactionMapper;
-import com.atlas.bank.transaction.dto.TransactionResponse;
-import com.atlas.bank.transaction.dto.TransferRequest;
+import com.atlas.bank.infrastructure.adapter.in.rest.dto.TransactionMapper;
+import com.atlas.bank.infrastructure.adapter.in.rest.dto.TransactionResponse;
+import com.atlas.bank.infrastructure.adapter.in.rest.dto.TransferRequest;
 import com.atlas.bank.domain.model.transaction.Transaction;
 import com.atlas.bank.application.service.ITransactionQueryService;
 import jakarta.validation.Valid;

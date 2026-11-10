@@ -1,4 +1,4 @@
-package com.atlas.bank.transaction.service.event;
+package com.atlas.bank.infrastructure.adapter.listener;
 
 import com.atlas.bank.domain.event.TransactionExecutedEvent;
 import lombok.extern.slf4j.Slf4j;
