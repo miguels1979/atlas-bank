@@ -1,31 +1,30 @@
-package com.atlas.bank.shared.model;
+package com.atlas.bank.infrastructure.adapter.out.persistence;
 
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Locale;
-
 @Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @EqualsAndHashCode
 public class Email {
 
+    @Column(nullable = false)
     private String value;
 
     private Email(String value) {
-        if(value == null || value.isBlank()){
+
+        if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("El email no puede ser nulo o vacío");
         }
-        String normalized = value.trim().toLowerCase(Locale.ROOT);
-        if(!normalized.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")){
-            throw new IllegalArgumentException("El email no tiene un formato válido");
+        if (!value.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            throw new IllegalArgumentException("El email no tiene un formato válido: " + value);
         }
-        this.value = normalized;
+
+        this.value = value.toLowerCase().trim();
     }
 
     public static Email of(String value) {

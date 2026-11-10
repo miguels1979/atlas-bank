@@ -6,7 +6,7 @@ import com.atlas.bank.infrastructure.adapter.in.rest.dto.AccountResponse;
 import com.atlas.bank.infrastructure.adapter.in.rest.dto.CreateAccountRequest;
 import com.atlas.bank.infrastructure.adapter.in.rest.dto.DashboardResponse;
 import com.atlas.bank.domain.model.account.Account;
-import com.atlas.bank.account.service.AccountDashboardFacade;
+import com.atlas.bank.infrastructure.adapter.in.AccountDashboardFacade;
 import com.atlas.bank.application.service.IAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

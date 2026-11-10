@@ -1,11 +1,11 @@
-package com.atlas.bank.customer.model;
+package com.atlas.bank.infrastructure.adapter.out.persistence;
 
-import com.atlas.bank.shared.model.Email;
+
+import com.atlas.bank.domain.model.customer.CustomerStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Entity
 @Table(name = "customers")
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode( onlyExplicitlyIncluded = true )
-public class Customer {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class CustomerJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class Customer {
     private String name;
 
     @Embedded
-    @AttributeOverride(name= "value", column = @Column(name = "email", nullable = false, unique = true))
+    @AttributeOverride(name = "value", column = @Column(name = "email", nullable = false, unique = true))
     private Email email;
 
     @Enumerated(EnumType.STRING)
@@ -38,10 +38,6 @@ public class Customer {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if(status == null) status = CustomerStatus.ACTIVE;
-    }
-
-    public boolean isActive() {
-        return this.status == CustomerStatus.ACTIVE;
+        if (status == null) status = CustomerStatus.ACTIVE;
     }
 }

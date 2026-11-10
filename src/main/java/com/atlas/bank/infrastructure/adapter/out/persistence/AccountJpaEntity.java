@@ -3,8 +3,6 @@ package com.atlas.bank.infrastructure.adapter.out.persistence;
 import com.atlas.bank.domain.model.account.AccountStatus;
 import com.atlas.bank.domain.model.account.AccountType;
 import com.atlas.bank.domain.model.shared.Currency;
-import com.atlas.bank.shared.model.Email;
-import com.atlas.bank.shared.model.Money;
 import jakarta.persistence.*;
 import lombok.*;
 

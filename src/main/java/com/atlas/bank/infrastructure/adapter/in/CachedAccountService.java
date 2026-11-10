@@ -1,4 +1,4 @@
-package com.atlas.bank.account.service;
+package com.atlas.bank.infrastructure.adapter.in;
 
 import com.atlas.bank.application.service.IAccountService;
 import com.atlas.bank.domain.model.account.Account;
