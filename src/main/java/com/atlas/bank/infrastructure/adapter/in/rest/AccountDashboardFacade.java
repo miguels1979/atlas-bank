@@ -1,4 +1,4 @@
-package com.atlas.bank.infrastructure.adapter.in;
+package com.atlas.bank.infrastructure.adapter.in.rest;
 
 
 import com.atlas.bank.infrastructure.adapter.in.rest.dto.DashboardResponse;

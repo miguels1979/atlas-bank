@@ -1,13 +1,10 @@
 package com.atlas.bank.domain.strategy.fee;
 
 import com.atlas.bank.domain.model.account.AccountType;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-@Component
-@Order(1)
+
 public class PremiumFeeCalculator implements FeeCalculator{
 
 
