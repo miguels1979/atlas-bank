@@ -1,8 +1,20 @@
 # Atlas Bank
 
-API REST de un banco de ejemplo, desarrollada con Spring Boot para practicar patrones de diseño. Gestiona cuentas y transferencias con comisiones, verificación de fraude y autenticación con Keycloak.
+API REST de un banco de ejemplo, desarrollada con Spring Boot para practicar patrones de diseño, Domain-Driven Design y arquitectura hexagonal. Gestiona cuentas y transferencias con comisiones, verificación de fraude y autenticación con Keycloak.
+
+El proyecto se migró de una **arquitectura en capas** a una **arquitectura hexagonal** (puertos y adaptadores), de modo que el dominio no depende de Spring, JPA ni de ningún servicio externo.
 
 > **Estado:** proyecto de aprendizaje en desarrollo. No está pensado para usarse en producción.
+
+## Características
+
+- Migración de arquitectura en capas a arquitectura hexagonal.
+- Dominio independiente del framework: los objetos del dominio se registran como beans desde `DomainBeanConfig`, sin anotaciones de Spring.
+- Value Objects (`Money`, `Email`) con validación e inmutabilidad.
+- Eventos de dominio (`TransactionExecutedEvent`) registrados por el agregado y publicados por el adaptador de persistencia.
+- Transferencias con comisiones según el tipo de cuenta y validaciones encadenadas.
+- Verificación de fraude mediante un servicio externo simulado.
+- Autenticación y autorización con JWT de Keycloak.
 
 ## Tecnologías
 
@@ -77,6 +89,61 @@ Todas las peticiones requieren la cabecera `Authorization: Bearer <token>`.
 
 La consola de H2 está en <http://localhost:8080/h2-console> (JDBC URL `jdbc:h2:file:./data/atlasbank`, usuario `sa`, sin contraseña).
 
+## Arquitectura
+
+### De capas a hexagonal
+
+Al principio, el proyecto estaba organizado por funcionalidad (`account`, `transaction`, `shared`), con la arquitectura en capas clásica:
+
+```text
+Controller → Service → Repository (Spring Data) → Base de datos
+```
+
+En ese modelo, las entidades JPA eran también el modelo de negocio, y los servicios dependían directamente de Spring Data.
+
+Con la migración a arquitectura hexagonal, el dominio queda en el centro y todo lo técnico se conecta mediante puertos y adaptadores:
+
+```text
+Adaptadores de entrada (REST)
+        │ usan
+        ▼
+Puertos de entrada (casos de uso)
+        │ los implementa
+        ▼
+Aplicación ──► Dominio
+        │ usa
+        ▼
+Puertos de salida (interfaces)
+        ▲ los implementan
+        │
+Adaptadores de salida (JPA, servicio de fraude)
+```
+
+Las dependencias siempre apuntan hacia dentro: el dominio no importa nada de `application` ni de `infrastructure`.
+
+### Conceptos aplicados
+
+| Concepto | En el proyecto |
+|---|---|
+| Puerto de entrada | `TransferMoneyUseCase`, `CreateAccountUseCase` |
+| Puerto de salida | `AccountRepositoryPort`, `TransactionRepositoryPort`, `CustomerRepositoryPort`, `FraudCheckPort` |
+| Adaptador de entrada | `AccountController`, `TransactionController` |
+| Adaptador de salida | `JpaAccountRepositoryAdapter`, `JpaTransactionRepositoryAdapter`, `JpaCustomerRepositoryAdapter`, `ExternalFraudCheckAdapter` |
+| Agregado | `Account`, `Transaction`, `Customer` |
+| Value Object | `Money`, `Email` y los `enum` (`Currency`, `AccountStatus`, `AccountType`…) |
+| Servicio de dominio | `TransferDomainService` |
+| Evento de dominio | `TransactionExecutedEvent`, escuchado por `AuditListener` y `NotificationListener` |
+
+### Modelo de dominio y modelo de persistencia
+
+Cada agregado tiene una versión de dominio y una entidad JPA, conectadas por un mapper manual:
+
+```text
+Account (dominio)  ⇄  AccountPersistenceMapper  ⇄  AccountJpaEntity (@Entity)
+```
+
+`Money` y `Email` existen en dos versiones: la del dominio (`domain.model.shared`) y una `@Embeddable` para JPA (`infrastructure.adapter.out.persistence`).
+
 ## Patrones de diseño
 
 | Patrón | Dónde se aplica |
@@ -86,7 +153,7 @@ La consola de H2 está en <http://localhost:8080/h2-console> (JDBC URL `jdbc:h2:
 | Factory Method | `TransactionFactory`: construcción de transacciones |
 | Observer | `TransactionExecutedEvent` y sus listeners |
 | Decorator | `CachedAccountService` y `AuditableAccountService` |
-| Adapter | `ExternalFraudCheckAdapter`: servicio de fraude externo (simulado) |
+| Adapter | Todos los adaptadores; por ejemplo, `ExternalFraudCheckAdapter` para el servicio de fraude externo (simulado) |
 | Facade | `AccountDashboardFacade`: datos del dashboard |
 | Builder | `DashboardResponse` |
 | Chain of Responsibility | `TransferValidator`: validaciones de una transferencia |
@@ -96,13 +163,28 @@ La consola de H2 está en <http://localhost:8080/h2-console> (JDBC URL `jdbc:h2:
 
 ```text
 src/main/java/com/atlas/bank
-├── account      # Cuentas: controller, servicios, modelo y DTOs
-├── transaction  # Transferencias: comisiones, fraude, eventos y validaciones
-└── shared       # Configuración de seguridad y manejo de errores
+├── domain              # Núcleo del negocio, sin dependencias de Spring
+│   ├── model           # Agregados y Value Objects: Account, Transaction, Customer, Money, Email
+│   ├── service         # Servicios de dominio: TransferDomainService
+│   ├── event           # Eventos de dominio: TransactionExecutedEvent
+│   ├── exception       # Excepciones del negocio
+│   ├── strategy        # Cálculo de comisiones
+│   └── validation      # Validaciones de transferencias
+├── application         # Casos de uso
+│   ├── port/in         # Puertos de entrada: lo que ofrece la aplicación
+│   ├── port/out        # Puertos de salida: lo que necesita del exterior
+│   └── service         # Implementación de los casos de uso
+└── infrastructure      # Detalles técnicos
+    ├── adapter/in      # Controllers REST, DTOs, caché y fachada del dashboard
+    ├── adapter/out     # Persistencia con JPA y servicio de fraude externo
+    ├── adapter/listener # Listeners de los eventos de dominio
+    └── config          # Seguridad, manejo de errores y registro de beans del dominio
 ```
 
 ## Pendientes
 
+- Quitar las anotaciones de JPA que aún quedan en `domain/model/account/Account.java`.
+- Usar `@TransactionalEventListener(phase = AFTER_COMMIT)` en los listeners, para notificar solo transferencias confirmadas.
 - Comprobar que un USER solo pueda acceder a sus propias cuentas.
 - Invalidar la caché de cuentas después de una transferencia.
 - Incluir la configuración del realm de Keycloak en el repositorio.
