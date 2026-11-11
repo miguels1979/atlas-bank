@@ -4,5 +4,5 @@ import com.atlas.bank.domain.model.account.Account;
 
 public interface CreateAccountUseCase {
 
-        Account execute (Account account);
+        Account create (Account account);
 }
