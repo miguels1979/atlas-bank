@@ -12,6 +12,7 @@ El proyecto se migró de una **arquitectura en capas** a una **arquitectura hexa
 - Dominio independiente del framework: los objetos del dominio se registran como beans desde `DomainBeanConfig`, sin anotaciones de Spring.
 - Value Objects (`Money`, `Email`) con validación e inmutabilidad.
 - Eventos de dominio (`TransactionExecutedEvent`) registrados por el agregado y publicados por el adaptador de persistencia.
+- Separación de comandos y consultas (CQRS): las consultas devuelven read models (`TransactionReadModel`, `DashBoardReadModel`) en lugar de objetos del dominio.
 - Transferencias con comisiones según el tipo de cuenta y validaciones encadenadas.
 - Verificación de fraude mediante un servicio externo simulado.
 - Autenticación y autorización con JWT de Keycloak.
@@ -125,7 +126,7 @@ Las dependencias siempre apuntan hacia dentro: el dominio no importa nada de `ap
 
 | Concepto | En el proyecto |
 |---|---|
-| Puerto de entrada | `TransferMoneyUseCase`, `CreateAccountUseCase` |
+| Puerto de entrada | `TransferMoneyUseCase`, `CreateAccountUseCase`, `GetAccountUseCase`, `ListAccountUseCase`, `GetTransactionsByAccountUseCase` |
 | Puerto de salida | `AccountRepositoryPort`, `TransactionRepositoryPort`, `CustomerRepositoryPort`, `FraudCheckPort` |
 | Adaptador de entrada | `AccountController`, `TransactionController` |
 | Adaptador de salida | `JpaAccountRepositoryAdapter`, `JpaTransactionRepositoryAdapter`, `JpaCustomerRepositoryAdapter`, `ExternalFraudCheckAdapter` |
@@ -133,6 +134,21 @@ Las dependencias siempre apuntan hacia dentro: el dominio no importa nada de `ap
 | Value Object | `Money`, `Email` y los `enum` (`Currency`, `AccountStatus`, `AccountType`…) |
 | Servicio de dominio | `TransferDomainService` |
 | Evento de dominio | `TransactionExecutedEvent`, escuchado por `AuditListener` y `NotificationListener` |
+| Command | `TransferMoneyCommand`: datos de entrada de una operación que cambia el estado |
+| Query | `GetAccountStatementQuery`: datos de entrada de una consulta |
+| Read model | `TransactionReadModel`, `DashBoardReadModel`: datos de solo lectura que devuelven las consultas |
+
+### Comandos y consultas (CQRS)
+
+Las operaciones que cambian datos y las que solo los leen se modelan por separado:
+
+| | Escritura | Lectura |
+|---|---|---|
+| Entrada | `TransferMoneyCommand` | `GetAccountStatementQuery` |
+| Modelo | `Transaction`, con reglas, estados y eventos | `TransactionReadModel` y `DashBoardReadModel`, datos planos e inmutables |
+| Caso de uso | `TransferMoneyUseCase` | `GetTransactionsByAccountUseCase` |
+
+Así, quien consulta no recibe objetos del dominio y no puede cambiar su estado por error.
 
 ### Modelo de dominio y modelo de persistencia
 
@@ -152,10 +168,10 @@ Account (dominio)  ⇄  AccountPersistenceMapper  ⇄  AccountJpaEntity (@Entity
 | Template Method | `TransactionProcessor`: flujo de una transacción |
 | Factory Method | `TransactionFactory`: construcción de transacciones |
 | Observer | `TransactionExecutedEvent` y sus listeners |
-| Decorator | `CachedAccountService` y `AuditableAccountService` |
+| Decorator | `AuditableAccountService`: añade auditoría a `AccountService` |
 | Adapter | Todos los adaptadores; por ejemplo, `ExternalFraudCheckAdapter` para el servicio de fraude externo (simulado) |
-| Facade | `AccountDashboardFacade`: datos del dashboard |
-| Builder | `DashboardResponse` |
+| Facade | `AccountDashboardFacade`: reúne la cuenta y sus movimientos para el dashboard |
+| Builder | `DashBoardReadModel`, con `@Builder` de Lombok sobre un `record` |
 | Chain of Responsibility | `TransferValidator`: validaciones de una transferencia |
 | State | `TransactionState`: ciclo de vida de una transacción |
 
@@ -173,9 +189,12 @@ src/main/java/com/atlas/bank
 ├── application         # Casos de uso
 │   ├── port/in         # Puertos de entrada: lo que ofrece la aplicación
 │   ├── port/out        # Puertos de salida: lo que necesita del exterior
+│   ├── command         # Datos de entrada de las operaciones: TransferMoneyCommand
+│   ├── query           # Consultas y read models: GetAccountStatementQuery, TransactionReadModel, DashBoardReadModel
+│   ├── facade          # AccountDashboardFacade
 │   └── service         # Implementación de los casos de uso
 └── infrastructure      # Detalles técnicos
-    ├── adapter/in      # Controllers REST, DTOs, caché y fachada del dashboard
+    ├── adapter/in      # Controllers REST y DTOs
     ├── adapter/out     # Persistencia con JPA y servicio de fraude externo
     ├── adapter/listener # Listeners de los eventos de dominio
     └── config          # Seguridad, manejo de errores y registro de beans del dominio
@@ -186,7 +205,6 @@ src/main/java/com/atlas/bank
 - Quitar las anotaciones de JPA que aún quedan en `domain/model/account/Account.java`.
 - Usar `@TransactionalEventListener(phase = AFTER_COMMIT)` en los listeners, para notificar solo transferencias confirmadas.
 - Comprobar que un USER solo pueda acceder a sus propias cuentas.
-- Invalidar la caché de cuentas después de una transferencia.
 - Incluir la configuración del realm de Keycloak en el repositorio.
 - Conectar Keycloak a la base de datos Postgres de Docker Compose.
 - Añadir tests.
