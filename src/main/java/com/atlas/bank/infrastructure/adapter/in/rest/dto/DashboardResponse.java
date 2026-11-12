@@ -1,5 +1,6 @@
 package com.atlas.bank.infrastructure.adapter.in.rest.dto;
 
+import com.atlas.bank.application.query.TransactionReadModel;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,6 +17,6 @@ public class DashboardResponse {
     private String type;
     private BigDecimal balance;
     private String status;
-    private List<TransactionResponse> recentTransactions;
+    private List<TransactionReadModel> recentTransactions;
 
 }

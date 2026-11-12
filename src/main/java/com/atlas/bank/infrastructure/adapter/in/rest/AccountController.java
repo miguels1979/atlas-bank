@@ -1,6 +1,7 @@
 package com.atlas.bank.infrastructure.adapter.in.rest;
 
 
+import com.atlas.bank.application.facade.AccountDashboardFacade;
 import com.atlas.bank.application.port.in.CreateAccountUseCase;
 import com.atlas.bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.application.port.in.ListAccountUseCase;
