@@ -44,7 +44,7 @@ public class AtlasBankTools {
     }
 
 
-    @Tool(description = "Consultar el saldo inicial de una cuenta del banco")
+    @Tool(description = "Consultar el saldo actual de una cuenta del banco")
     public String getAccountBalance(
             @ToolParam(description = "ID de la cuenta a consultar") String accountId
     ){

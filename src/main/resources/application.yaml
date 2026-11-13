@@ -4,7 +4,7 @@ spring:
       api-key: ollama
       base-url: http://localhost:11434/v1
       chat:
-        model: qwen3:4b
+        model: qwen3:4b-instruct
   application:
     name: atlas-bank
   datasource:

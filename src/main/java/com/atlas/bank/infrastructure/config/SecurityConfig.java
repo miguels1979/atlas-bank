@@ -31,6 +31,8 @@ public class SecurityConfig {
                         //Transactions
                         .requestMatchers(HttpMethod.POST, "/api/v1/transactions/transfer").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/transactions/{id}/transactions").hasAnyRole("USER", "ADMIN")
+                        //AI
+                        .requestMatchers("/api/v1/ai/**").permitAll()
                         //H2
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
