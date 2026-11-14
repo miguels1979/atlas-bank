@@ -3,10 +3,12 @@ package com.atlas.bank.domain.model.account;
 import com.atlas.bank.domain.model.shared.Currency;
 import com.atlas.bank.domain.model.shared.Email;
 import com.atlas.bank.domain.model.shared.Money;
+import com.atlas.bank.domain.exception.AccountNotActiveException;
 import com.atlas.bank.domain.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter @Setter
@@ -42,6 +44,17 @@ public class Account {
             throw new InsufficientFundsException(id, balance.getAmount(), amount.getAmount());
         }
         balance = balance.subtract(amount);
+    }
+
+    public void close() {
+        if (status != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(id, status.name());
+        }
+        if (balance.getAmount().compareTo(BigDecimal.ZERO) != 0) {
+            throw new IllegalStateException("La cuenta " + id + " tiene saldo " + balance
+                    + ". Retira el saldo antes de cerrarla");
+        }
+        status = AccountStatus.CLOSED;
     }
 
     public void initDefaults() {

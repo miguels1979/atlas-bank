@@ -1,8 +1,10 @@
 package com.atlas.bank.infrastructure.adapter.in.ai;
 
 import com.atlas.bank.application.command.TransferMoneyCommand;
+import com.atlas.bank.application.port.in.CloseAccountUseCase;
 import com.atlas.bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.application.port.in.TransferMoneyUseCase;
+import com.atlas.bank.domain.exception.AccountNotActiveException;
 import com.atlas.bank.domain.exception.InsufficientFundsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ public class AtlasBankTools {
 
     private final TransferMoneyUseCase transferMoneyUseCase;
     private final GetAccountUseCase  getAccountUseCase;
+    private final CloseAccountUseCase closeAccountUseCase;
 
 
     @Tool(description = "Transferir dinero entre dos cuentas del banco atlas-bank")
@@ -57,5 +60,21 @@ public class AtlasBankTools {
             return "No se pudo consultar la cuenta " + e.getMessage();
         }
 
+    }
+
+
+    @Tool(description = "Cerrar una cuenta del banco atlas-bank. Úsalo solo cuando el cliente pida explícitamente cerrar o cancelar una cuenta")
+    public String closeAccount(
+            @ToolParam(description = "ID de la cuenta a cerrar") String accountId
+    ){
+        try{
+            var account = closeAccountUseCase.close(Long.parseLong(accountId));
+            return "La cuenta " + account.getAccountNumber() + " fue cerrada correctamente";
+        }catch(AccountNotActiveException | IllegalStateException e){
+            return "No se pudo cerrar la cuenta: " + e.getMessage();
+        } catch(Exception e){
+            log.error("Error en closeAccount desde IA", e);
+            return "No se pudo cerrar la cuenta: " + e.getMessage();
+        }
     }
 }

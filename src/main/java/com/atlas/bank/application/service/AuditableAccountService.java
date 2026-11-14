@@ -1,6 +1,7 @@
 package com.atlas.bank.application.service;
 
 import com.atlas.bank.application.command.CreateAccountCommand;
+import com.atlas.bank.application.port.in.CloseAccountUseCase;
 import com.atlas.bank.application.port.in.CreateAccountUseCase;
 import com.atlas.bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.application.port.in.ListAccountUseCase;
@@ -16,18 +17,21 @@ import java.util.List;
 @Slf4j
 @Component
 @Primary
-public class AuditableAccountService implements CreateAccountUseCase, ListAccountUseCase , GetAccountUseCase {
+public class AuditableAccountService implements CreateAccountUseCase, ListAccountUseCase , GetAccountUseCase, CloseAccountUseCase {
 
     private final CreateAccountUseCase createAccountUseCase;
     private final ListAccountUseCase listAccountUseCase;
     private final GetAccountUseCase getAccountUseCase;
+    private final CloseAccountUseCase closeAccountUseCase;
 
     public AuditableAccountService(@Qualifier("accountService") CreateAccountUseCase createAccountUseCase,
                                    @Qualifier("accountService") ListAccountUseCase listAccountUseCase,
-                                   @Qualifier("accountService") GetAccountUseCase getAccountUseCase) {
+                                   @Qualifier("accountService") GetAccountUseCase getAccountUseCase,
+                                   @Qualifier("accountService") CloseAccountUseCase closeAccountUseCase) {
         this.createAccountUseCase = createAccountUseCase;
         this.listAccountUseCase = listAccountUseCase;
         this.getAccountUseCase = getAccountUseCase;
+        this.closeAccountUseCase = closeAccountUseCase;
     }
 
 
@@ -57,6 +61,15 @@ public class AuditableAccountService implements CreateAccountUseCase, ListAccoun
     @Override
     public Account findById(Long id) {
         return getAccountUseCase.findById(id);
+    }
+
+    @Override
+    public Account close(Long accountId) {
+        //Se estaría persistiendo en una tabla diferente, de auditoría
+        log.info("Cerrando cuenta - ID: {}", accountId);
+        Account closed = closeAccountUseCase.close(accountId);
+        log.info("Cuenta cerrada exitosamente - ID: {}, numero: {}", closed.getId(), closed.getAccountNumber());
+        return closed;
     }
 
 }

@@ -2,6 +2,7 @@ package com.atlas.bank.application.service;
 
 
 import com.atlas.bank.application.command.CreateAccountCommand;
+import com.atlas.bank.application.port.in.CloseAccountUseCase;
 import com.atlas.bank.application.port.in.CreateAccountUseCase;
 import com.atlas.bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.application.port.in.ListAccountUseCase;
@@ -12,6 +13,7 @@ import com.atlas.bank.domain.model.shared.Currency;
 import com.atlas.bank.domain.model.shared.Email;
 import com.atlas.bank.domain.model.shared.Money;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService implements CreateAccountUseCase , ListAccountUseCase, GetAccountUseCase {
+public class AccountService implements CreateAccountUseCase , ListAccountUseCase, GetAccountUseCase, CloseAccountUseCase {
 
     private final AccountRepositoryPort accountRepository;
 
@@ -51,6 +53,17 @@ public class AccountService implements CreateAccountUseCase , ListAccountUseCase
         return accountRepository.findById(id).orElseThrow(
                 ()-> new AccountNotFoundException(id)
         );
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "accounts", key = "#accountId")
+    public Account close(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(
+                ()-> new AccountNotFoundException(accountId)
+        );
+        account.close();
+        return accountRepository.save(account);
     }
 
 }
